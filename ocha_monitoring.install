@@ -1,0 +1,50 @@
+<?php
+/**
+ * @file
+ * Monitoring base install file.
+ */
+
+use Drupal\monitoring\Entity\SensorConfig;
+
+/**
+ * Implements hook_install().
+ *
+ * Disable sensors from contrib.
+ */
+function ocha_monitoring_install() {
+  if (\Drupal::service('config.installer')->isSyncing()) {
+    // Don't create any config when syncing.
+    // @todo change to $is_syncing param after 8.9 is minimum per
+    // https://www.drupal.org/node/3098920
+    return;
+  }
+
+  $active_sensors = [
+    'core_cron_last_run_age',
+    'core_maintenance_mode',
+    'core_requirements_memcache',
+    'core_requirements_mysql',
+    'core_requirements_system',
+    'monitoring_installed_modules',
+    'ocha_current_drupal_version',
+    'ocha_current_php_version',
+    'ocha_current_release',
+    'ocha_deployment_identifier',
+    'update_contrib',
+    'update_core',
+  ];
+
+  // Disable sensors from contrib.
+  $sensor_configs = SensorConfig::loadMultiple();
+
+  foreach ($sensor_configs as $sensor) {
+    if (in_array($sensor->id(), $active_sensors)) {
+      $sensor->setStatus(TRUE);
+      $sensor->save();
+    }
+    else {
+      $sensor->setStatus(FALSE);
+      $sensor->save();
+    }
+  }
+}
