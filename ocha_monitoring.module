@@ -29,10 +29,10 @@ function ocha_monitoring_monitors() {
 function ocha_monitoring_enforce_monitors() {
   foreach (ocha_monitoring_monitors() as $id) {
     $config_id = 'monitoring.sensor_config.' . $id;
+    $config_path = \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/' . $config_id . '.yml';
+    $data = Yaml::parseFile($config_path);
+    \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
   }
-  $config_path = \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/' . $config_id . '.yml';
-  $data = Yaml::parseFile($config_path);
-  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
 }
 
 /**
