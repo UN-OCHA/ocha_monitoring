@@ -3,6 +3,7 @@
 namespace Drupal\ocha_monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\SensorPluginBase;
@@ -29,11 +30,19 @@ class OchaGoogleTagSensorPlugin extends SensorPluginBase {
   protected $entityTypeManager;
 
   /**
+   * Module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(SensorConfig $sensor_config, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(SensorConfig $sensor_config, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler) {
     parent::__construct($sensor_config, $plugin_id, $plugin_definition);
     $this->entityTypeManager = $entity_type_manager;
+    $this->moduleHandler = $module_handler;
   }
 
   /**
@@ -45,6 +54,7 @@ class OchaGoogleTagSensorPlugin extends SensorPluginBase {
       $plugin_id,
       $plugin_definition,
       $container->get('entity_type.manager'),
+      $container->get('module_handler'),
     );
   }
 
@@ -52,6 +62,12 @@ class OchaGoogleTagSensorPlugin extends SensorPluginBase {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
+    if (!$this->moduleHandler->moduleExists('google_tag')) {
+      $result->setValue('Module not installed');
+      $result->setMessage('Module not installed');
+      $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+    }
+
     $storage = $this->entityTypeManager->getStorage('google_tag_container');
     $config_ids = $storage->getQuery()
       ->accessCheck(FALSE)
