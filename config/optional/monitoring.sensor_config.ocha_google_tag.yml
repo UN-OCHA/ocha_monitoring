@@ -1,0 +1,18 @@
+uuid: 9e305aea-af25-4d43-8441-998dbfc4bd21
+langcode: en
+status: true
+dependencies:
+  module:
+    - google_tag
+id: ocha_google_tag
+label: 'Google tag'
+description: 'Google tag'
+category: OCHA
+plugin_id: ocha_google_tag
+result_class: null
+value_label: 'GTM Id'
+value_type: string
+caching_time: null
+settings: {  }
+thresholds:
+  type: none
