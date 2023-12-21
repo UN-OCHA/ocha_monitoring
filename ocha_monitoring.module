@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Monitoring file.
+ */
+
+use Symfony\Component\Yaml\Yaml;
+use DrupalFinder\DrupalFinder;
+use GuzzleHttp\TransferStats;
+
+/**
+ * Active list of our monitors.
+ */
+function ocha_monitoring_monitors() {
+  return [
+    'ocha_current_drupal_version',
+    'ocha_current_php_version',
+    'ocha_current_release',
+    'ocha_deployment_identifier',
+    'ocha_google_tag',
+    'ocha_common_design',
+  ];
+}
+
+/**
+ * Re-add al config.
+ */
+function ocha_monitoring_enforce_monitors() {
+  foreach (ocha_monitoring_monitors() as $id) {
+    $config_id = 'monitoring.sensor_config.' . $id;
+  }
+  $config_path = \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/' . $config_id . '.yml';
+  $data = Yaml::parseFile($config_path);
+  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+}
+
+/**
+ * Get installed version from composer.
+ */
+function ocha_monitoring_get_version_info_from_composer($prefix, $project) {
+  $drupalFinder = new DrupalFinder();
+  if (!$drupalFinder->locateRoot(DRUPAL_ROOT)) {
+    return [];
+  }
+
+  $package = ocha_monitoring_get_composer_packages($drupalFinder->getVendorDir(), $prefix, $project);
+  if ($package) {
+    // Fetch latests tag from Github.
+    $latest = 'Unknown';
+
+    try {
+      $url = str_replace('.git', '', $package['source']['url']) . '/releases/latest';
+      $final_path = '';
+
+      $response = Drupal::httpClient()->head($url, [
+        'on_stats' => function (TransferStats $stats) use (&$final_path) {
+          $final_path = $stats->getEffectiveUri()->getPath();
+        },
+      ]);
+
+      if ($response->getStatusCode() == 200) {
+        $parts = explode('/', $final_path);
+        $latest = array_pop($parts);
+      }
+    }
+    catch (\Exception) {
+      $latest = 'Not found';
+    }
+
+    return [
+      'version' => $package['version'],
+      'latest' => $latest,
+    ];
+  }
+}
+
+/**
+ * Get package info from composer.
+ */
+function ocha_monitoring_get_composer_packages($path, $prefix, $project) {
+  $packages = &drupal_static(__FUNCTION__);
+
+  if (!$packages) {
+    $packages = json_decode(file_get_contents($path . '/composer/installed.json'), TRUE);
+    // Composer 2.0 compatibility.
+    // @see https://getcomposer.org/upgrade/UPGRADE-2.0.md
+    $packages = $packages['packages'] ?? $packages;
+    $packages = is_array($packages) ? $packages : [];
+  }
+
+  foreach ($packages as $package) {
+    if ($package['name'] == $prefix . '/' . $project) {
+      return $package;
+    }
+  }
+
+  return [];
+}

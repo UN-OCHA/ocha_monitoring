@@ -1,23 +1,11 @@
 <?php
+
 /**
  * @file
  * Monitoring base install file.
  */
 
 use Drupal\monitoring\Entity\SensorConfig;
-
-/**
- * Active list of our monitors.
- */
-function ocha_monitoring_monitors() {
-  return [
-    'ocha_current_drupal_version',
-    'ocha_current_php_version',
-    'ocha_current_release',
-    'ocha_deployment_identifier',
-    'ocha_google_tag',
-  ];
-}
 
 /**
  * Implements hook_install().
@@ -39,14 +27,9 @@ function ocha_monitoring_install() {
     'core_requirements_mysql',
     'core_requirements_system',
     'monitoring_installed_modules',
-    'ocha_current_drupal_version',
-    'ocha_current_php_version',
-    'ocha_current_release',
-    'ocha_deployment_identifier',
-    'ocha_google_tag',
     'update_contrib',
     'update_core',
-  ];
+  ] + ocha_monitoring_monitors();
 
   // Disable sensors from contrib.
   $sensor_configs = SensorConfig::loadMultiple();
@@ -67,10 +50,5 @@ function ocha_monitoring_install() {
  * Re-add al config.
  */
 function ocha_monitoring_update_10000(&$sandbox) {
-  foreach (ocha_monitoring_monitors() as $id) {
-    $config_id = 'monitoring.sensor_config.' . $id;
-  }
-  $config_path = \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/' . $config_id .'.yml';
-  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_path);
-  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+  ocha_monitoring_enforce_monitors();
 }
