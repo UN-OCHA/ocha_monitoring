@@ -69,7 +69,7 @@ function ocha_monitoring_get_version_info_from_composer($prefix, $project) {
     }
 
     return [
-      'version' => $package['version'],
+      'version' => $package['version'] ?? 'Unknown',
       'latest' => $latest,
     ];
   }
