@@ -3,16 +3,13 @@
 namespace Drupal\ocha_monitoring\Plugin\monitoring\SensorPlugin;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\google_tag\Entity\TagContainer;
 use Drupal\monitoring\Entity\SensorConfig;
 use Drupal\monitoring\Result\SensorResultInterface;
 use Drupal\monitoring\SensorPlugin\SensorPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Monitors commerce order turnover stats.
- *
- * Based on SensorEntityDatabaseAggregator using commerce_order table.
+ * Monitors GTM.
  *
  * @SensorPlugin(
  *   id = "ocha_google_tag",
@@ -25,7 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class OchaGoogleTagSensorPlugin extends SensorPluginBase {
 
   /**
-   * Local variable to store \Drupal::entityTypeManger().
+   * Entity Type Manager.
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
@@ -62,7 +59,7 @@ class OchaGoogleTagSensorPlugin extends SensorPluginBase {
       ->sort('weight')
       ->execute();
 
-    /** @var array<string, TagContainer> $configs */
+    /** @var array<string, \Drupal\google_tag\Entity\TagContainer> $configs */
     $configs = $storage->loadMultiple($config_ids);
     foreach ($configs as $config) {
       $tag = $config->container_id ?? '';

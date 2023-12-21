@@ -30,6 +30,7 @@ function ocha_monitoring_install() {
     'ocha_current_php_version',
     'ocha_current_release',
     'ocha_deployment_identifier',
+    'ocha_google_tag',
     'update_contrib',
     'update_core',
   ];
