@@ -7,6 +7,19 @@
 use Drupal\monitoring\Entity\SensorConfig;
 
 /**
+ * Active list of our monitors.
+ */
+function ocha_monitoring_monitors() {
+  return [
+    'ocha_current_drupal_version',
+    'ocha_current_php_version',
+    'ocha_current_release',
+    'ocha_deployment_identifier',
+    'ocha_google_tag',
+  ];
+}
+
+/**
  * Implements hook_install().
  *
  * Disable sensors from contrib.
@@ -48,4 +61,16 @@ function ocha_monitoring_install() {
       $sensor->save();
     }
   }
+}
+
+/**
+ * Re-add al config.
+ */
+function ocha_monitoring_update_10000(&$sandbox) {
+  foreach (ocha_monitoring_monitors() as $id) {
+    $config_id = 'monitoring.sensor_config.' . $id;
+  }
+  $config_path = \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/' . $config_id .'.yml';
+  $data = \Symfony\Component\Yaml\Yaml::parseFile($config_path);
+  \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
 }
