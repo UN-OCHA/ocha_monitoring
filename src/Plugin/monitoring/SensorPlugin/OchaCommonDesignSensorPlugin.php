@@ -65,6 +65,7 @@ class OchaCommonDesignSensorPlugin extends SensorPluginBase {
       $result->setValue('CD not installed');
       $result->setMessage('CD not installed');
       $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+      return;
     }
 
     $default = $this->themeHandler->getDefault();

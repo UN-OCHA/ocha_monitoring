@@ -51,30 +51,46 @@ class OchaEnvironmentLinkFixerSensorPlugin extends SensorPluginBase {
    * {@inheritdoc}
    */
   public function runSensor(SensorResultInterface $result) {
-    if (!$this->moduleHandler->moduleExists('env_link_fixer')) {
+    $module_name = 'env_link_fixer';
+
+    if (!$this->moduleHandler->moduleExists($module_name)) {
       $result->setValue('Module not installed');
       $result->setMessage('Module not installed');
       $result->setStatus(SensorResultInterface::STATUS_UNKNOWN);
       return;
     }
 
-    $version_info = ocha_monitoring_get_version_info_from_composer('drupal', 'env_link_fixer');
-    if (empty($version_info)) {
-      $result->setValue('Module not found in composer');
-      $result->setMessage('Module not found in composer');
+    $available = update_get_available();
+    if (!isset($available[$module_name])) {
+      $result->setValue('Module not found in updates');
+      $result->setMessage('Module not found in updates');
       $result->setStatus(SensorResultInterface::STATUS_UNKNOWN);
       return;
     }
 
-    if ($version_info['version'] == $version_info['latest']) {
-      $result->setValue('Latest version install');
-      $result->setMessage('Latest version install');
-      $result->setStatus(SensorResultInterface::STATUS_OK);
+    $project_data = update_calculate_project_data($available);
+    if (!isset($project_data[$module_name])) {
+      $result->setValue('Module not found in updates');
+      $result->setMessage('Module not found in updates');
+      $result->setStatus(SensorResultInterface::STATUS_UNKNOWN);
       return;
     }
 
+    if (isset($project_data[$module_name]['latest_version']) && isset($project_data[$module_name]['existing_version'])) {
+      if ($project_data[$module_name]['latest_version'] == $project_data[$module_name]['existing_version']) {
+        $result->setValue('Latest version install');
+        $result->setMessage('Latest version install');
+        $result->setStatus(SensorResultInterface::STATUS_OK);
+        return;
+      }
+
+      $result->setValue('Environment Link Fixer not up to date');
+      $result->setMessage($project_data[$module_name]['existing_version'] . ' installed, ' . $project_data[$module_name]['latest_version'] . ' available');
+      $result->setStatus(SensorResultInterface::STATUS_WARNING);
+    }
+
     $result->setValue('Environment Link Fixer not up to date');
-    $result->setMessage($version_info['version'] . ' installed, ' . $version_info['latest'] . ' available');
+    $result->setMessage('Environment Link Fixer not up to date');
     $result->setStatus(SensorResultInterface::STATUS_WARNING);
   }
 

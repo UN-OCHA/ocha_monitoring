@@ -65,6 +65,7 @@ class OchaGoogleTagSensorPlugin extends SensorPluginBase {
       $result->setValue('Module not installed');
       $result->setMessage('Module not installed');
       $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+      return;
     }
 
     $storage = $this->entityTypeManager->getStorage('google_tag_container');

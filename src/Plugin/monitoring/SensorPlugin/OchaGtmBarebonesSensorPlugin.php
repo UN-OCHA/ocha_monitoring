@@ -65,6 +65,7 @@ class OchaGtmBarebonesSensorPlugin extends SensorPluginBase {
       $result->setValue('Module not installed');
       $result->setMessage('Module not installed');
       $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+      return;
     }
 
     $config = $this->configFactory->get('gtm_barebones.settings');
