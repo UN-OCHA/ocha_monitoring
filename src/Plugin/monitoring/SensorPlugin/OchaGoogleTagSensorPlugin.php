@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "ocha_google_tag",
  *   label = @Translation("Google tag"),
  *   description = @Translation("Monitors google tag."),
- *   provider = "google_tag",
  *   addable = FALSE
  * )
  */

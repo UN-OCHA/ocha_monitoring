@@ -19,7 +19,9 @@ function ocha_monitoring_monitors() {
     'ocha_current_release',
     'ocha_deployment_identifier',
     'ocha_google_tag',
+    'ocha_gtm_barebones',
     'ocha_common_design',
+    'ocha_un_date',
   ];
 }
 
@@ -45,34 +47,36 @@ function ocha_monitoring_get_version_info_from_composer($prefix, $project) {
   }
 
   $package = ocha_monitoring_get_composer_packages($drupalFinder->getVendorDir(), $prefix, $project);
-  if ($package) {
-    // Fetch latests tag from Github.
-    $latest = 'Unknown';
-
-    try {
-      $url = str_replace('.git', '', $package['source']['url']) . '/releases/latest';
-      $final_path = '';
-
-      $response = Drupal::httpClient()->head($url, [
-        'on_stats' => function (TransferStats $stats) use (&$final_path) {
-          $final_path = $stats->getEffectiveUri()->getPath();
-        },
-      ]);
-
-      if ($response->getStatusCode() == 200) {
-        $parts = explode('/', $final_path);
-        $latest = array_pop($parts);
-      }
-    }
-    catch (\Exception) {
-      $latest = 'Not found';
-    }
-
-    return [
-      'version' => $package['version'] ?? 'Unknown',
-      'latest' => $latest,
-    ];
+  if (!$package) {
+    return [];
   }
+
+  // Fetch latests tag from Github.
+  $latest = 'Unknown';
+
+  try {
+    $url = str_replace('.git', '', $package['source']['url']) . '/releases/latest';
+    $final_path = '';
+
+    $response = Drupal::httpClient()->head($url, [
+      'on_stats' => function (TransferStats $stats) use (&$final_path) {
+        $final_path = $stats->getEffectiveUri()->getPath();
+      },
+    ]);
+
+    if ($response->getStatusCode() == 200) {
+      $parts = explode('/', $final_path);
+      $latest = array_pop($parts);
+    }
+  }
+  catch (\Exception) {
+    $latest = 'Not found';
+  }
+
+  return [
+    'version' => $package['version'] ?? 'Unknown',
+    'latest' => $latest,
+  ];
 }
 
 /**
