@@ -22,6 +22,7 @@ function ocha_monitoring_monitors() {
     'ocha_gtm_barebones',
     'ocha_common_design',
     'ocha_un_date',
+    'ocha_env_link_fixer',
   ];
 }
 
