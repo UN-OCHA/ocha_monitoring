@@ -23,6 +23,7 @@ function ocha_monitoring_monitors() {
     'ocha_common_design',
     'ocha_un_date',
     'ocha_env_link_fixer',
+    'ocha_ocha_monitoring',
   ];
 }
 
