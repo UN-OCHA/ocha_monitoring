@@ -14,12 +14,12 @@ use GuzzleHttp\TransferStats;
  * Active list of sensors.
  */
 function ocha_monitoring_active_monitors() {
-  return [
+  return array_merge([
     'core_cron_last_run_age',
     'monitoring_installed_modules',
     'update_contrib',
     'update_core',
-  ] + ocha_monitoring_monitors();
+  ], ocha_monitoring_monitors());
 }
 
 /**
