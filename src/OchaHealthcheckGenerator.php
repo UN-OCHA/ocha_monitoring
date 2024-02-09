@@ -72,6 +72,8 @@ class OchaHealthcheckGenerator {
       'summary' => $shortSummary,
       'status' => $sensorResult->getStatus(),
       'meta' => $meta,
+      'timestamp' => $sensorResult->getTimestamp(),
+      'execution_time' => $sensorResult->getExecutionTime(),
     ];
   }
 

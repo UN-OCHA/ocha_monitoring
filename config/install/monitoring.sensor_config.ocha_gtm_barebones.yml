@@ -1,11 +1,11 @@
 langcode: en
 status: true
 dependencies: {}
-id: ocha_google_tag
-label: 'Google tag'
-description: 'Google tag'
+id: ocha_gtm_barebones
+label: 'GTM Barebones'
+description: 'GTM Barebones'
 category: OCHA
-plugin_id: ocha_google_tag
+plugin_id: ocha_gtm_barebones
 result_class: null
 value_label: 'GTM Id'
 value_type: string

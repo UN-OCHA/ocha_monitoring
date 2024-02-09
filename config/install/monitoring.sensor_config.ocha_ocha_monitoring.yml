@@ -1,11 +1,11 @@
 langcode: en
 status: true
-dependencies: {  }
-id: ocha_current_drupal_version
-label: 'Current drupal version'
-description: 'Current drupal version'
+dependencies: {}
+id: ocha_ocha_monitoring
+label: 'OCHA Monitoring'
+description: 'OCHA Monitoring'
 category: OCHA
-plugin_id: ocha_current_drupal_version
+plugin_id: ocha_ocha_monitoring
 result_class: null
 value_label: 'Version'
 value_type: string

@@ -16,7 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "ocha_google_tag",
  *   label = @Translation("Google tag"),
  *   description = @Translation("Monitors google tag."),
- *   provider = "google_tag",
  *   addable = FALSE
  * )
  */
@@ -66,6 +65,7 @@ class OchaGoogleTagSensorPlugin extends SensorPluginBase {
       $result->setValue('Module not installed');
       $result->setMessage('Module not installed');
       $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
+      return;
     }
 
     $storage = $this->entityTypeManager->getStorage('google_tag_container');

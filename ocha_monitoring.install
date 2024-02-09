@@ -22,10 +22,6 @@ function ocha_monitoring_install() {
 
   $active_sensors = [
     'core_cron_last_run_age',
-    'core_maintenance_mode',
-    'core_requirements_memcache',
-    'core_requirements_mysql',
-    'core_requirements_system',
     'monitoring_installed_modules',
     'update_contrib',
     'update_core',
@@ -50,5 +46,12 @@ function ocha_monitoring_install() {
  * Re-add al config.
  */
 function ocha_monitoring_update_10000(&$sandbox) {
+  ocha_monitoring_enforce_monitors();
+}
+
+/**
+ * Re-add al config.
+ */
+function ocha_monitoring_update_10001(&$sandbox) {
   ocha_monitoring_enforce_monitors();
 }

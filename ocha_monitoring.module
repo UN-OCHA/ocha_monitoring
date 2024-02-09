@@ -5,9 +5,22 @@
  * Monitoring file.
  */
 
+use Drupal\monitoring\Entity\SensorConfig;
 use Symfony\Component\Yaml\Yaml;
 use DrupalFinder\DrupalFinder;
 use GuzzleHttp\TransferStats;
+
+/**
+ * Active list of sensors.
+ */
+function ocha_monitoring_active_monitors() {
+  return array_merge([
+    'core_cron_last_run_age',
+    'monitoring_installed_modules',
+    'update_contrib',
+    'update_core',
+  ], ocha_monitoring_monitors());
+}
 
 /**
  * Active list of our monitors.
@@ -19,7 +32,11 @@ function ocha_monitoring_monitors() {
     'ocha_current_release',
     'ocha_deployment_identifier',
     'ocha_google_tag',
+    'ocha_gtm_barebones',
     'ocha_common_design',
+    'ocha_un_date',
+    'ocha_env_link_fixer',
+    'ocha_ocha_monitoring',
   ];
 }
 
@@ -27,11 +44,27 @@ function ocha_monitoring_monitors() {
  * Re-add al config.
  */
 function ocha_monitoring_enforce_monitors() {
+  // Reload our sensors from disk.
   foreach (ocha_monitoring_monitors() as $id) {
     $config_id = 'monitoring.sensor_config.' . $id;
     $config_path = \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/' . $config_id . '.yml';
     $data = Yaml::parseFile($config_path);
     \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+  }
+
+  // Activate sensors we want.
+  // Disable sensors from contrib.
+  $sensor_configs = SensorConfig::loadMultiple();
+
+  foreach ($sensor_configs as $sensor) {
+    if (in_array($sensor->id(), ocha_monitoring_active_monitors())) {
+      $sensor->setStatus(TRUE);
+      $sensor->save();
+    }
+    else {
+      $sensor->setStatus(FALSE);
+      $sensor->save();
+    }
   }
 }
 
@@ -45,34 +78,36 @@ function ocha_monitoring_get_version_info_from_composer($prefix, $project) {
   }
 
   $package = ocha_monitoring_get_composer_packages($drupalFinder->getVendorDir(), $prefix, $project);
-  if ($package) {
-    // Fetch latests tag from Github.
-    $latest = 'Unknown';
-
-    try {
-      $url = str_replace('.git', '', $package['source']['url']) . '/releases/latest';
-      $final_path = '';
-
-      $response = Drupal::httpClient()->head($url, [
-        'on_stats' => function (TransferStats $stats) use (&$final_path) {
-          $final_path = $stats->getEffectiveUri()->getPath();
-        },
-      ]);
-
-      if ($response->getStatusCode() == 200) {
-        $parts = explode('/', $final_path);
-        $latest = array_pop($parts);
-      }
-    }
-    catch (\Exception) {
-      $latest = 'Not found';
-    }
-
-    return [
-      'version' => $package['version'] ?? 'Unknown',
-      'latest' => $latest,
-    ];
+  if (!$package) {
+    return [];
   }
+
+  // Fetch latests tag from Github.
+  $latest = 'Unknown';
+
+  try {
+    $url = str_replace('.git', '', $package['source']['url']) . '/releases/latest';
+    $final_path = '';
+
+    $response = Drupal::httpClient()->head($url, [
+      'on_stats' => function (TransferStats $stats) use (&$final_path) {
+        $final_path = $stats->getEffectiveUri()->getPath();
+      },
+    ]);
+
+    if ($response->getStatusCode() == 200) {
+      $parts = explode('/', $final_path);
+      $latest = array_pop($parts);
+    }
+  }
+  catch (\Exception) {
+    $latest = 'Not found';
+  }
+
+  return [
+    'version' => $package['version'] ?? 'Unknown',
+    'latest' => $latest,
+  ];
 }
 
 /**
