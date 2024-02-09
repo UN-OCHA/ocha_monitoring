@@ -49,6 +49,8 @@ class OchaCurrentComposerVersionSensorPlugin extends SensorPluginBase {
       $result->setStatus(SensorResultInterface::STATUS_INFO);
     }
     else {
+      $result->setValue('');
+      $result->setMessage('Composer version not detected');
       $result->setStatus(SensorResultInterface::STATUS_ERROR);
     }
   }
