@@ -73,7 +73,8 @@ class OchaCurrentComposerVersionSensorPlugin extends SensorPluginBase {
     $composer_version_string = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
 
-    // Return null on error, so the plugin can set error status.
+    // Return false on error, so the plugin can set error status.
+    // Composer exit status is 0 on success.
     $ret = proc_close($composer);
     if ($ret !== 0) {
       return FALSE;
