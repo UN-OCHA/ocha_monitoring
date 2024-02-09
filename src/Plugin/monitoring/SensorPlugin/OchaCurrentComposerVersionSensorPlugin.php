@@ -70,6 +70,11 @@ class OchaCurrentComposerVersionSensorPlugin extends SensorPluginBase {
     // Run compose rusing proc_open, which is allegedly safest.
     $composer = proc_open(['composer', '-V'], $desc, $pipes);
 
+    // Oy vey!
+    if (!is_resource($composer)) {
+      return FALSE;
+    }
+
     $composer_version_string = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
 
