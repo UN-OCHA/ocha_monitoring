@@ -37,6 +37,7 @@ function ocha_monitoring_monitors() {
     'ocha_un_date',
     'ocha_env_link_fixer',
     'ocha_ocha_monitoring',
+    'ocha_current_composer_version',
   ];
 }
 
