@@ -51,7 +51,7 @@ class OchaCurrentComposerVersionSensorPlugin extends SensorPluginBase {
     else {
       $result->setValue('');
       $result->setMessage('Composer version not detected');
-      $result->setStatus(SensorResultInterface::STATUS_ERROR);
+      $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
     }
   }
 
@@ -67,7 +67,7 @@ class OchaCurrentComposerVersionSensorPlugin extends SensorPluginBase {
       2 => ["pipe", "w"],
     ];
 
-    // Run compose rusing proc_open, which is allegedly safest.
+    // Run composer using proc_open, which is allegedly safest.
     $composer = proc_open(['composer', '-V'], $desc, $pipes);
 
     // Oy vey!
@@ -88,16 +88,16 @@ class OchaCurrentComposerVersionSensorPlugin extends SensorPluginBase {
     // Extract the version string using sscanf().
     // This will break if the string format changes.
     // "Composer version 2.6.6 2023-12-08 18:32:26"
-    $ret = sscanf($version_output, "Composer version %d.%d.%d %s %s");
+    $ret = sscanf($composer_version_string, "Composer version %d.%d.%d %s %s");
 
     // We should have an array with 5 values.
-    if (count($ret)) !== 5) {
+    if (count($ret) !== 5) {
         return FALSE;
     }
 
     // Set the versions.
-    $this->major   = $ret[0];
-    $this->minor   = $ret[1];
+    $this->major = $ret[0];
+    $this->minor = $ret[1];
     $this->release = $ret[2];
 
     // And the timestamp.
