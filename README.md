@@ -10,5 +10,11 @@ Provides custom sensors and enables only those that we need.
 
 `drush config:export`
 
-Commit the monitoring-related config changes (including composer files and
-`config/core.extension.yml`).
+Commit the following files:
+`composer.json`
+`composer.lock`
+`config/core.extension.yml`
+`config/views.view.monitoring_sensor_results.yml`
+`config/language/*/views.view.monitoring_sensor_results.yml`
+`config/monitoring.settings.yml`
+`config/monitoring.sensor_config.ocha_*`
