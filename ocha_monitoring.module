@@ -31,7 +31,6 @@ function ocha_monitoring_monitors() {
     'ocha_current_php_version',
     'ocha_current_release',
     'ocha_deployment_identifier',
-    'ocha_google_tag',
     'ocha_gtm_barebones',
     'ocha_common_design',
     'ocha_un_date',
