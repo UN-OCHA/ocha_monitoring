@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * Monitoring api file.
+ */
+
+/**
+ * Implements hook_ocha_monitoring_active_monitors_alter.
+ */
+function hook_ocha_monitoring_active_monitors_alter(&$active_monitors) {
+  // Remove one monitor.
+  $monitor = 'ocha_un_date';
+  if (in_array($monitor, $active_monitors)) {
+    unset($active_monitors[array_search($monitor, $active_monitors)]);
+  }
+
+  // Add a custom monitor.
+  $monitor = 'my_custom_monitor';
+  if (!in_array($monitor, $active_monitors)) {
+    $active_monitors[] = $monitor;
+  }
+
+  // Remove several monitors.
+  $active_monitors = array_diff($active_monitors, [
+    'ocha_current_drupal_version',
+    'ocha_current_php_version',
+    'ocha_current_release',
+    'ocha_deployment_identifier',
+  ]);
+}
+

@@ -14,12 +14,26 @@ use GuzzleHttp\TransferStats;
  * Active list of sensors.
  */
 function ocha_monitoring_active_monitors() {
-  return array_merge([
+  $active_monitors = &drupal_static(__FUNCTION__);
+  if (isset($active_monitors)) {
+    return $active_monitors;
+  }
+
+  $active_monitors = array_merge([
     'core_cron_last_run_age',
     'monitoring_installed_modules',
     'update_contrib',
     'update_core',
   ], ocha_monitoring_monitors());
+
+  // Allow other modules to alter status.
+  \Drupal::moduleHandler()->invokeAll('ocha_monitoring_active_monitors_alter', [
+    &$active_monitors,
+  ]);
+
+  // Reset index.
+  $active_monitors = array_values($active_monitors);
+  return $active_monitors;
 }
 
 /**
