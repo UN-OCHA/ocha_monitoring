@@ -64,36 +64,12 @@ class OchaGoogleTagSensorPlugin extends SensorPluginBase {
     if (!$this->moduleHandler->moduleExists('google_tag')) {
       $result->setValue('Module not installed');
       $result->setMessage('Module not installed');
-      $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
-      return;
-    }
-
-    $storage = $this->entityTypeManager->getStorage('google_tag_container');
-    $config_ids = $storage->getQuery()
-      ->accessCheck(FALSE)
-      ->condition('status', 1)
-      ->sort('weight')
-      ->execute();
-
-    /** @var array<string, \Drupal\google_tag\Entity\TagContainer> $configs */
-    $configs = $storage->loadMultiple($config_ids);
-    foreach ($configs as $config) {
-      $tag = $config->container_id ?? '';
-      if ($tag == 'GTM-xxxxxx') {
-        $result->setValue($tag);
-        $result->setMessage('Tag not set in Ansible');
-        $result->setStatus(SensorResultInterface::STATUS_WARNING);
-        return;
-      }
-
-      $result->setValue($tag);
-      $result->setMessage($tag);
       $result->setStatus(SensorResultInterface::STATUS_OK);
       return;
     }
 
-    $result->setValue('No tag found');
-    $result->setMessage('No tag found');
+    $result->setValue('Google tag is still enabled');
+    $result->setMessage('Please use gtm_barebones');
     $result->setStatus(SensorResultInterface::STATUS_CRITICAL);
   }
 
