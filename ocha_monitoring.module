@@ -59,12 +59,29 @@ function ocha_monitoring_monitors() {
  * Re-add al config.
  */
 function ocha_monitoring_enforce_monitors() {
+  $paths = [
+    \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/',
+    \Drupal::service('extension.list.module')->getPath('monitoring') . '/config/install/',
+    \Drupal::service('extension.list.module')->getPath('monitoring') . '/config/optional/',
+  ];
+
   // Reload our sensors from disk.
-  foreach (ocha_monitoring_monitors() as $id) {
+  foreach (ocha_monitoring_active_monitors() as $id) {
     $config_id = 'monitoring.sensor_config.' . $id;
-    $config_path = \Drupal::service('extension.list.module')->getPath('ocha_monitoring') . '/config/install/' . $config_id . '.yml';
-    $data = Yaml::parseFile($config_path);
-    \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+    $config_file = $config_id . '.yml';
+    $data = [];
+
+    foreach($paths as $path) {
+      $config_path = $path . $config_file;
+      if (!file_exists($config_path)) {
+        continue;
+      }
+      $data = Yaml::parseFile($config_path);
+    }
+
+    if ($data) {
+      \Drupal::configFactory()->getEditable($config_id)->setData($data)->save(TRUE);
+    }
   }
 
   // Activate sensors we want.
