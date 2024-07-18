@@ -88,6 +88,10 @@ class OchaAdminPathsSensorPlugin extends SensorPluginBase {
           // Skip inaccessible paths.
           $skipped[] = $path;
         }
+        catch (\Throwable $e) {
+          // Skip inaccessible paths.
+          $skipped[] = $path;
+        }
       }
     }
 
