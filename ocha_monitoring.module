@@ -7,7 +7,7 @@
 
 use Drupal\monitoring\Entity\SensorConfig;
 use Symfony\Component\Yaml\Yaml;
-use DrupalFinder\DrupalFinder;
+use DrupalFinder\DrupalFinderComposerRuntime;
 use GuzzleHttp\TransferStats;
 
 /**
@@ -104,8 +104,8 @@ function ocha_monitoring_enforce_monitors() {
  * Get installed version from composer.
  */
 function ocha_monitoring_get_version_info_from_composer($prefix, $project) {
-  $drupalFinder = new DrupalFinder();
-  if (!$drupalFinder->locateRoot(DRUPAL_ROOT)) {
+  $drupalFinder = new DrupalFinderComposerRuntime();
+  if (!$drupalFinder->getDrupalRoot()) {
     return [];
   }
 
