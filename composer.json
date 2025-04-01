@@ -4,6 +4,7 @@
     "license": "GPL-2.0-or-later",
     "type": "drupal-module",
     "require": {
-        "drupal/monitoring": "^1"
+        "drupal/monitoring": "^1",
+        "webflo/drupal-finder": "^1.3"
     }
 }
